@@ -163,6 +163,27 @@ body {
   border: 1px solid rgba(148, 163, 184, .12);
 }
 
+.short-answer {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.short-answer label {
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.short-answer textarea {
+  width: 100%;
+  min-height: 120px;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, .16);
+  padding: 0.95rem 1rem;
+  background: rgba(255,255,255,.04);
+  color: var(--text);
+  resize: vertical;
+}
+
 .answer-correct {
   color: var(--success);
 }

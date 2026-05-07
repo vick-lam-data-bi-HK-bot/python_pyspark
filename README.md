@@ -18,6 +18,7 @@ This repository contains a static, interactive multiple-choice quiz for reviewin
 4. Data Sink & Output Management
 5. Optimization & Debugging
 6. Testing, Security & CI/CD
+7. Interview Short Questions for enterprise banking pipeline practice
 
 ### How to use locally
 

@@ -392,6 +392,70 @@ const questions = [
     ],
     answerIndex: 0,
     explanation: 'Spark supports --py-files for .zip/.py distribution and spark.archives for transporting Conda/Venv environments to executors.'
+  },
+  {
+    id: 31,
+    section: 'Interview Short Questions',
+    type: 'short',
+    question: 'Describe the main layers of an enterprise banking end-to-end data pipeline.',
+    answerText: 'Ingestion, processing/transformation, storage, serving/analytics, and monitoring/governance.',
+    explanation: 'Enterprise banking pipelines typically include these layers to handle raw data intake, transformation, long-term storage, consumption, and operational monitoring.'
+  },
+  {
+    id: 32,
+    section: 'Interview Short Questions',
+    type: 'short',
+    question: 'Why is schema enforcement important for corporate banking data pipelines?',
+    answerText: 'It prevents illegal or inconsistent data from entering the pipeline and supports reliable reporting and compliance.',
+    explanation: 'Strict schemas help catch bad records early and make downstream analytics more reliable in regulated banking environments.'
+  },
+  {
+    id: 33,
+    section: 'Interview Short Questions',
+    type: 'short',
+    question: 'Name two ways to manage late-arriving event time data in a streaming pipeline.',
+    answerText: 'Use watermarking and event-time windowing, or use a late data handling layer that reprocesses delayed events.',
+    explanation: 'Banking streams often arrive late, so watermarking and proper window policies keep state bounded and handle timeliness requirements.'
+  },
+  {
+    id: 34,
+    section: 'Interview Short Questions',
+    type: 'short',
+    question: 'What capability does a Delta Lake transaction log provide for enterprise pipelines?',
+    answerText: 'It provides ACID consistency, version history, and time travel for auditing and rollback.',
+    explanation: 'A transaction log ensures atomic writes and lets banking teams audit or recover previous pipeline states safely.'
+  },
+  {
+    id: 35,
+    section: 'Interview Short Questions',
+    type: 'short',
+    question: 'How does data lineage support compliance in corporate banking?',
+    answerText: 'It tracks the origin and transformations of data so auditors can verify where values came from.',
+    explanation: 'Lineage is essential for regulatory reporting, forensic analysis, and ensuring trusted finance data across systems.'
+  },
+  {
+    id: 36,
+    section: 'Interview Short Questions',
+    type: 'short',
+    question: 'What is the best practice for storing credentials used by Spark jobs in enterprise environments?',
+    answerText: 'Store them in a secrets vault and access them via secure configs or environment variables, not code.',
+    explanation: 'Using secret management avoids hardcoded credentials and protects sensitive banking access details.'
+  },
+  {
+    id: 37,
+    section: 'Interview Short Questions',
+    type: 'short',
+    question: 'Which two monitoring metrics should you watch for a large banking batch pipeline?',
+    answerText: 'Job duration and data freshness / lag.',
+    explanation: 'Tracking runtime and freshness helps detect slow jobs or delayed data delivery in enterprise pipelines.'
+  },
+  {
+    id: 38,
+    section: 'Interview Short Questions',
+    type: 'short',
+    question: 'How should you handle schema evolution for customer or transaction records?',
+    answerText: 'Use schema evolution features in Parquet/Avro/Delta and version metadata while avoiding breaking changes.',
+    explanation: 'A controlled evolution process keeps historical data readable and ensures new fields are adopted safely in banking pipelines.'
   }
 ];
 
@@ -432,21 +496,48 @@ function renderQuiz(filter = 'all') {
     `;
 
     const optionsContainer = card.querySelector('.options');
-    question.options.forEach((optionText, index) => {
-      const optionLabel = document.createElement('label');
-      optionLabel.className = 'option';
-      optionLabel.innerHTML = `
-        <input type="radio" name="question-${question.id}" value="${index}" />
-        <span>${optionText}</span>
+    if (question.type === 'short') {
+      const shortWrapper = document.createElement('div');
+      shortWrapper.className = 'short-answer';
+      shortWrapper.innerHTML = `
+        <label for="short-${question.id}">Your short written answer</label>
+        <textarea id="short-${question.id}" rows="4" placeholder="Write your response here..."></textarea>
       `;
-      optionsContainer.appendChild(optionLabel);
-    });
+      optionsContainer.appendChild(shortWrapper);
+    } else {
+      question.options.forEach((optionText, index) => {
+        const optionLabel = document.createElement('label');
+        optionLabel.className = 'option';
+        optionLabel.innerHTML = `
+          <input type="radio" name="question-${question.id}" value="${index}" />
+          <span>${optionText}</span>
+        `;
+        optionsContainer.appendChild(optionLabel);
+      });
+    }
 
     const resultBox = card.querySelector('.answer-feedback');
     const resultText = card.querySelector('.result');
     const explanationText = card.querySelector('.explanation');
 
     card.querySelector('.check-btn').addEventListener('click', () => {
+      if (question.type === 'short') {
+        const userInput = card.querySelector(`#short-${question.id}`).value.trim();
+        if (!userInput) {
+          resultText.textContent = 'Please write your answer before checking.';
+          resultText.className = 'result answer-wrong';
+          explanationText.textContent = '';
+          resultBox.hidden = false;
+          return;
+        }
+
+        resultText.textContent = 'Short answer recorded. Compare with the model answer below.';
+        resultText.className = 'result answer-correct';
+        explanationText.textContent = `${question.answerText} ${question.explanation}`;
+        resultBox.hidden = false;
+        return;
+      }
+
       const selected = card.querySelector(`input[name="question-${question.id}"]:checked`);
       if (!selected) {
         resultText.textContent = 'Please choose an option before checking.';
@@ -465,6 +556,14 @@ function renderQuiz(filter = 'all') {
     });
 
     card.querySelector('.show-btn').addEventListener('click', () => {
+      if (question.type === 'short') {
+        resultText.textContent = 'Model answer:';
+        resultText.className = 'result answer-correct';
+        explanationText.textContent = `${question.answerText} ${question.explanation}`;
+        resultBox.hidden = false;
+        return;
+      }
+
       resultText.textContent = `Answer: ${String.fromCharCode(65 + question.answerIndex)}.`;
       resultText.className = 'result answer-correct';
       explanationText.textContent = question.explanation;
@@ -478,6 +577,7 @@ function renderQuiz(filter = 'all') {
 sectionFilter.addEventListener('change', () => renderQuiz(sectionFilter.value));
 resetButton.addEventListener('click', () => {
   document.querySelectorAll('input[type=radio]').forEach(input => input.checked = false);
+  document.querySelectorAll('textarea').forEach(textarea => textarea.value = '');
   document.querySelectorAll('.answer-feedback').forEach(box => { box.hidden = true; });
 });
 
